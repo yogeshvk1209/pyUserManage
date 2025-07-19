@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - DB_NAME=user_management
+      - COLLECTION_NAME=user_operations
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/src
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:7.0
+    container_name: user_management_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=user_management
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
